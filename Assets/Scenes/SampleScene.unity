@@ -236,6 +236,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 6380322158202748105, guid: 296b8320004d1eb4499fd8ed5cbb7bb5, type: 3}
+  mainCamera: {fileID: 519420031}
 --- !u!4 &1249271609
 Transform:
   m_ObjectHideFlags: 0
@@ -280,7 +281,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stageJsonList:
-  - {fileID: 4900000, guid: 247d7ae329c959842b9407680840b7e9, type: 3}
+  - {fileID: 4900000, guid: 2ffa2bcb2111a0e4a989c9132a88622f, type: 3}
 --- !u!4 &1320393165
 Transform:
   m_ObjectHideFlags: 0

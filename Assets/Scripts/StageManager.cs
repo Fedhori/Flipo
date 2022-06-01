@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
+// 스테이지 정보들을 저장하고 이를 파싱하는 역할을 수행
 public class StageManager : MonoBehaviour
 {
     public static StageManager stageManager;
@@ -19,32 +20,29 @@ public class StageManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        SerializeStage("/StageData", "Test Stage 1");
     }
 
     // Update is called once per frame
     void Update()
     {
+        
     }
 
     public void SerializeStage(string downloadPath, string stageName)
     {
         StageInfo stageInfo = new StageInfo(
-            new int[10, 10]
+            new int[5, 5]
             {
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 2, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {1, 1, 2, 1, 1},
+                {1, 1, 2, 1, 1},
+                {2, 2, 4, 2, 2},
+                {1, 1, 2, 1, 1},
+                {1, 1, 2, 1, 1},
             },
             new DragAction[]
             {
+                new DragAction(DragActionType.DECREASE, 1),
                 new DragAction(DragActionType.DECREASE, 1),
                 new DragAction(DragActionType.DECREASE, 1),
                 new DragAction(DragActionType.DECREASE, 1),
