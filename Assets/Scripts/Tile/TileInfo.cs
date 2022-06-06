@@ -32,6 +32,9 @@ public class TileInfo : MonoBehaviour {
     if (counter == 0) {
       gameObject.SetActive(false);
     }
+    else {
+      gameObject.SetActive(true);
+    }
   }
 
   public void SetSelected(bool value) {
