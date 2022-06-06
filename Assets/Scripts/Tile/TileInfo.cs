@@ -12,10 +12,10 @@ public class TileInfo : MonoBehaviour {
   }
 
   private static readonly Color[] tileColorArray = {
-    new Color(243f / 255f, 129f / 255f, 129f / 255f),
-    new Color(252f / 255f, 227f / 255f, 138f / 255f),
-    new Color(234f / 255f, 255f / 255f, 208f / 255f),
-    new Color(149f / 255f, 225f / 255f, 211f / 255f)
+    new Color(140f / 255f, 179f / 255f, 105f / 255f),
+    new Color(244f / 255f, 226f / 255f, 133f / 255f),
+    new Color(244f / 255f, 162f / 255f, 89f / 255f),
+    new Color(188f / 255f, 75f / 255f, 81f / 255f)
   };
 
   bool isSelected;
