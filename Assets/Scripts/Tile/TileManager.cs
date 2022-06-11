@@ -37,13 +37,7 @@ public class TileManager : MonoBehaviour {
 
   private void Awake() {
     tileManager = this;
-  }
-
-  // Start is called before the first frame update
-  void Start() {
-    SetStage(StageManager.stageManager.GetCurrentStageInfo(0));
-    GenerateTiles();
-    GenerateActionContainers();
+    GenerateStage(StageManager.stageManager.currentStageInfo);
   }
 
   // Update is called once per frame
@@ -184,7 +178,7 @@ public class TileManager : MonoBehaviour {
       (int) (offsetRemovedPosition.y / tileSize + 0.5f));
   }
 
-  void SetStage(StageInfo stageInfo) {
+  public void SetStage(StageInfo stageInfo) {
     actionIndex = 0;
 
     xLength = stageInfo.tileCounterArray.GetLength(0);
@@ -220,5 +214,11 @@ public class TileManager : MonoBehaviour {
       actionContainer.GetComponent<ActionManager>().SetDragAction(item.value);
       dragActionObjectArray[item.index] = actionContainer;
     }
+  }
+
+  public void GenerateStage(StageInfo stageInfo) {
+    SetStage(stageInfo);
+    GenerateTiles();
+    GenerateActionContainers();
   }
 }
