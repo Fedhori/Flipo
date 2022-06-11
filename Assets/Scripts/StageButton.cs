@@ -8,7 +8,7 @@ public class StageButton : MonoBehaviour {
 
   public void SetStageNumber(int number) {
     stageNumber = number;
-    stageNumberText.text = number.ToString();
+    stageNumberText.text = (number + 1).ToString();
   }
 
   public void OnClick() {

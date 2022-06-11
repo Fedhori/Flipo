@@ -284,7 +284,7 @@ MonoBehaviour:
   m_StartAxis: 0
   m_CellSize: {x: 128, y: 128}
   m_Spacing: {x: 0, y: 0}
-  m_Constraint: 2
+  m_Constraint: 1
   m_ConstraintCount: 6
 --- !u!1 &858484388
 GameObject:
@@ -469,6 +469,7 @@ MonoBehaviour:
   StageButtonPrefab: {fileID: 8028810468027753636, guid: f1eed444e6d27db4982aaecd893141af, type: 3}
   stageButtonsContainer: {fileID: 853943670}
   stageJsonList:
+  - {fileID: 4900000, guid: 2ffa2bcb2111a0e4a989c9132a88622f, type: 3}
   - {fileID: 4900000, guid: 2ffa2bcb2111a0e4a989c9132a88622f, type: 3}
 --- !u!4 &1856213797
 Transform:

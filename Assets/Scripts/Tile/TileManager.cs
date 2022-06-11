@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // 타일과 관련된 로직들을 수행
 public class TileManager : MonoBehaviour {
@@ -51,8 +52,13 @@ public class TileManager : MonoBehaviour {
       OnHandleButtonDrag(coordinate);
     }
 
-    if (Input.GetKeyDown(KeyCode.Escape) && actionIndex > 0) {
-      UndoAction();
+    if (Input.GetKeyDown(KeyCode.Escape)) {
+      if (actionIndex > 0) {
+        UndoAction();
+      }
+      else {
+        SceneManager.LoadScene("MenuScene");
+      }
     }
   }
 
