@@ -2,20 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// 타일과 관련된 로직들을 수행
-public class TileManager : MonoBehaviour {
-  public static TileManager tileManager;
+// 에디터의 타일과 관련된 로직들을 수행
+public class EditorTileManager : MonoBehaviour {
+  public static EditorTileManager editorTileManager;
 
   [SerializeField] private GameObject tilePrefab;
   [SerializeField] private GameObject actionContainerPrefab;
-
   [SerializeField] private RectTransform actionsContainer;
-
   [SerializeField] private Camera mainCamera;
 
   int[,] tileCounterArray;
@@ -26,20 +23,24 @@ public class TileManager : MonoBehaviour {
   private GameObject[] dragActionObjectArray;
 
   private int actionIndex;
-  int yLength;
-  int xLength;
+  int yLength = 10;
+  int xLength = 10;
   int tileWidthOffset;
   int tileHeightOffset;
   int originalTileSize = 32;
   int tileSize = 64;
 
+  private const int MAXActionLength = 100;
+
   private bool isDragging;
   private Vector2Int startCoordinate;
   private Vector2Int currentCoordinate;
 
+  public DragAction currentDragAction = new DragAction(DragActionType.DECREASE, 1);
+
   private void Awake() {
-    tileManager = this;
-    GenerateStage(StageManager.stageManager.currentStageInfo);
+    editorTileManager = this;
+    GenerateStage();
   }
 
   // Update is called once per frame
@@ -64,7 +65,8 @@ public class TileManager : MonoBehaviour {
   }
 
   void OnHandleButtonDown(Vector2Int coordinate) {
-    if (CheckIsTile(coordinate) && actionIndex < dragActionArray.Length) {
+    Debug.Log(coordinate);
+    if (CheckIsTile(coordinate)) {
       isDragging = true;
       startCoordinate = coordinate;
     }
@@ -74,7 +76,7 @@ public class TileManager : MonoBehaviour {
     if (isDragging) {
       MemoryTileCounterArray();
       UpdateTiles();
-      HideActionContainer();
+      ShowActionContainer();
       ClearSelectedTiles();
       isDragging = false;
       actionIndex++;
@@ -82,7 +84,7 @@ public class TileManager : MonoBehaviour {
   }
 
   void OnHandleButtonDrag(Vector2Int coordinate) {
-    if (isDragging && CheckIsTile(coordinate) && CheckIsValidDrag(coordinate)) {
+    if (isDragging && CheckIsTile(coordinate)) {
       currentCoordinate = coordinate;
       SetSelectedTiles();
     }
@@ -90,7 +92,7 @@ public class TileManager : MonoBehaviour {
 
   void UndoAction() {
     actionIndex--;
-    ShowActionContainer();
+    HideActionContainer();
     for (int i = 0; i < xLength; i++) {
       for (int j = 0; j < yLength; j++) {
         tileCounterArray[i, j] = tileCounterMemoryArray[actionIndex, i, j];
@@ -115,7 +117,7 @@ public class TileManager : MonoBehaviour {
 
     for (int i = startX; i <= endX; i++) {
       for (int j = startY; j <= endY; j++) {
-        HandleActionType(dragActionArray[actionIndex].dragActionType, i, j);
+        HandleActionType(i, j);
       }
     }
   }
@@ -155,24 +157,7 @@ public class TileManager : MonoBehaviour {
   }
 
   bool CheckIsTile(Vector2Int coordinate) {
-    return coordinate.x < xLength && coordinate.x >= 0 && coordinate.y < yLength && coordinate.y >= 0 &&
-           tileCounterArray[coordinate.x, coordinate.y] != 0;
-  }
-
-  bool CheckIsValidDrag(Vector2Int targetCoordinate) {
-    int startX = Math.Min(startCoordinate.x, targetCoordinate.x);
-    int endX = Math.Max(startCoordinate.x, targetCoordinate.x);
-    int startY = Math.Min(startCoordinate.y, targetCoordinate.y);
-    int endY = Math.Max(startCoordinate.y, targetCoordinate.y);
-
-    for (int i = startX; i <= endX; i++) {
-      for (int j = startY; j <= endY; j++) {
-        if (tileCounterArray[i, j] == 0)
-          return false;
-      }
-    }
-
-    return true;
+    return coordinate.x < xLength && coordinate.x >= 0 && coordinate.y < yLength && coordinate.y >= 0;
   }
 
   Vector2Int GetCoordinate(Vector3 position) {
@@ -182,19 +167,16 @@ public class TileManager : MonoBehaviour {
       (int) (offsetRemovedPosition.y / tileSize + 0.5f));
   }
 
-  public void SetStage(StageInfo stageInfo) {
-    xLength = stageInfo.tileCounterArray.GetLength(0);
-    yLength = stageInfo.tileCounterArray.GetLength(1);
-
+  public void SetStage() {
     tileHeightOffset = xLength * tileSize / 2 - tileSize / 2;
     tileWidthOffset = yLength * tileSize / 2 - tileSize / 2;
 
-    tileCounterArray = stageInfo.tileCounterArray;
-    tileCounterMemoryArray = new int[stageInfo.dragActionList.Length, xLength, yLength];
+    tileCounterArray = new int[xLength, yLength];
+    tileCounterMemoryArray = new int[MAXActionLength, xLength, yLength];
     tileObjectArray = new GameObject[xLength, yLength];
-
-    dragActionArray = stageInfo.dragActionList;
-    dragActionObjectArray = new GameObject[stageInfo.dragActionList.Length];
+    
+    dragActionArray = new DragAction[MAXActionLength];
+    dragActionObjectArray = new GameObject[MAXActionLength];
   }
 
   void GenerateTiles() {
@@ -204,36 +186,36 @@ public class TileManager : MonoBehaviour {
         tile.transform.localScale =
           new Vector2((float) tileSize / originalTileSize, (float) tileSize / originalTileSize);
         tile.transform.Translate(i * tileSize - tileWidthOffset, j * tileSize - tileHeightOffset, 0);
-        tile.GetComponent<TileInfo>().SetCounter(tileCounterArray[i, j]);
+        tile.GetComponent<TileInfo>().SetIsEditorTile(true);
+        tile.GetComponent<TileInfo>().SetCounter(0);
         tileObjectArray[i, j] = tile;
       }
     }
   }
-
-  void GenerateActionContainers() {
-    foreach (var item in dragActionArray.Select((value, index) => (value, index))) {
-      GameObject actionContainer = Instantiate(actionContainerPrefab, actionsContainer);
-      actionContainer.GetComponent<ActionManager>().SetDragAction(item.value);
-      dragActionObjectArray[item.index] = actionContainer;
-    }
+  
+  void AddAction(DragAction dragAction) {
+    GameObject actionContainer = Instantiate(actionContainerPrefab, actionsContainer);
+    actionContainer.GetComponent<ActionManager>().SetDragAction(dragAction);
+    dragActionObjectArray[actionIndex] = actionContainer;
+    actionIndex++;
   }
 
-  void GenerateStage(StageInfo stageInfo) {
-    SetStage(stageInfo);
+  public void GenerateStage() {
+    SetStage();
     GenerateTiles();
-    GenerateActionContainers();
   }
-
-  void HandleActionType(DragActionType dragActionType, int x, int y) {
-    switch (dragActionType) {
+  
+  void HandleActionType(int x, int y) {
+    switch (currentDragAction.dragActionType) {
       case DragActionType.DECREASE:
-        tileCounterArray[x, y]--;
-        break;
-      case DragActionType.INCREASE:
         tileCounterArray[x, y]++;
         break;
+      case DragActionType.INCREASE:
+        tileCounterArray[x, y]--;
+        break;
     }
 
+    dragActionArray[actionIndex] = currentDragAction;
     tileObjectArray[x, y].GetComponent<TileInfo>().SetCounter(tileCounterArray[x, y]);
   }
 }

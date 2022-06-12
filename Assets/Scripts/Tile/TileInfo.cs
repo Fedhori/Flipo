@@ -6,10 +6,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class TileInfo : MonoBehaviour {
-  public TileInfo(int counter) {
-    this.counter = counter;
-    textMeshPro.text = counter.ToString();
-  }
 
   private static readonly Color[] tileColorArray = {
     new Color(140f / 255f, 179f / 255f, 105f / 255f),
@@ -18,6 +14,7 @@ public class TileInfo : MonoBehaviour {
     new Color(188f / 255f, 75f / 255f, 81f / 255f)
   };
 
+  private bool isEditorTile;
   bool isSelected;
   int counter;
 
@@ -29,7 +26,7 @@ public class TileInfo : MonoBehaviour {
     counter = value;
     textMeshPro.text = counter.ToString();
     tileColor.color = tileColorArray[(counter + tileColorArray.Length - 1) % tileColorArray.Length];
-    if (counter == 0) {
+    if (counter == 0 && !isEditorTile) {
       gameObject.SetActive(false);
     }
     else {
@@ -37,6 +34,10 @@ public class TileInfo : MonoBehaviour {
     }
   }
 
+  public void SetIsEditorTile(bool value) {
+    isEditorTile = value;
+  }
+  
   public void SetSelected(bool value) {
     isSelected = value;
     if (isSelected) {
