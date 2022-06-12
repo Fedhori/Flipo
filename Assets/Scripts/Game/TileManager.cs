@@ -76,8 +76,8 @@ public class TileManager : MonoBehaviour {
       UpdateTiles();
       HideActionContainer();
       ClearSelectedTiles();
+      
       isDragging = false;
-      actionIndex++;
     }
   }
 
@@ -89,7 +89,6 @@ public class TileManager : MonoBehaviour {
   }
 
   void UndoAction() {
-    actionIndex--;
     ShowActionContainer();
     for (int i = 0; i < xLength; i++) {
       for (int j = 0; j < yLength; j++) {
@@ -121,11 +120,13 @@ public class TileManager : MonoBehaviour {
   }
 
   void ShowActionContainer() {
+    actionIndex--;
     dragActionObjectArray[actionIndex].GetComponent<ActionManager>().ShowActionContainer();
   }
 
   void HideActionContainer() {
-    dragActionObjectArray[actionIndex].GetComponent<ActionManager>().HideAction();
+    dragActionObjectArray[actionIndex].GetComponent<ActionManager>().HideActionContainer();
+    actionIndex++;
   }
 
   void SetSelectedTiles() {
@@ -186,8 +187,8 @@ public class TileManager : MonoBehaviour {
     xLength = stageInfo.tileCounterArray.GetLength(0);
     yLength = stageInfo.tileCounterArray.GetLength(1);
 
-    tileHeightOffset = xLength * tileSize / 2 - tileSize / 2;
-    tileWidthOffset = yLength * tileSize / 2 - tileSize / 2;
+    tileHeightOffset = yLength * tileSize / 2 - tileSize / 2;
+    tileWidthOffset = xLength * tileSize / 2 - tileSize / 2;
 
     tileCounterArray = stageInfo.tileCounterArray;
     tileCounterMemoryArray = new int[stageInfo.dragActionList.Length, xLength, yLength];

@@ -469,8 +469,12 @@ MonoBehaviour:
   StageButtonPrefab: {fileID: 8028810468027753636, guid: f1eed444e6d27db4982aaecd893141af, type: 3}
   stageButtonsContainer: {fileID: 853943670}
   stageJsonList:
-  - {fileID: 4900000, guid: 2ffa2bcb2111a0e4a989c9132a88622f, type: 3}
-  - {fileID: 4900000, guid: 2ffa2bcb2111a0e4a989c9132a88622f, type: 3}
+  - {fileID: 4900000, guid: 0174e24ad4435e441a25b108218ce59a, type: 3}
+  - {fileID: 4900000, guid: 176d86df44b90104fbc6d71ce6f9689f, type: 3}
+  - {fileID: 4900000, guid: c1c20b15d36ffe04797c896af27f3f8c, type: 3}
+  - {fileID: 4900000, guid: 8fcd8260bbb8ee94f8814bd39dd57cd7, type: 3}
+  - {fileID: 4900000, guid: 09d3e11cfc40643439701fe676371c43, type: 3}
+  - {fileID: 4900000, guid: 2292259a901314f4891751e59dfce5a7, type: 3}
 --- !u!4 &1856213797
 Transform:
   m_ObjectHideFlags: 0

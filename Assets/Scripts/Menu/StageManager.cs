@@ -17,32 +17,11 @@ public class StageManager : MonoBehaviour {
   
   private void Awake() {
     stageManager = this;
-    DontDestroyOnLoad(gameObject);
   }
 
-  // Start is called before the first frame update
-  void Start() {
-    SerializeStage("/StageData", "Test Stage 1");
-    PlayerPrefs.GetInt("lastStage", 0);
+  private void Start() {
     GenerateStageButtons();
-  }
-
-  public void SerializeStage(string downloadPath, string stageName) {
-    StageInfo stageInfo = new StageInfo(
-      new int[5, 6] {
-        {1, 1, 2, 1, 1, 1},
-        {1, 1, 2, 1, 1, 1},
-        {2, 2, 3, 1, 1, 1},
-        {1, 1, 1, 0, 0, 0},
-        {1, 1, 1, 0, 0, 0},
-      },
-      new DragAction[] {
-        new DragAction(DragActionType.DECREASE, 1),
-        new DragAction(DragActionType.DECREASE, 1),
-        new DragAction(DragActionType.DECREASE, 1),
-      });
-    File.WriteAllText(Path.Combine(Application.dataPath + downloadPath + "/" + stageName + ".json"),
-      JsonConvert.SerializeObject(stageInfo));
+    PlayerPrefs.GetInt("lastStage", 0);
   }
 
   public StageInfo DeserializeStage(TextAsset stageJson) {

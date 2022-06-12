@@ -31,7 +31,7 @@ public class ActionManager: MonoBehaviour {
     actionValueText.text = dragActionValue.ToString();
   }
 
-  public void HideAction() {
+  public void HideActionContainer() {
     gameObject.SetActive(false);
   }
 
