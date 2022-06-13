@@ -17,7 +17,7 @@ public class ActionManager: MonoBehaviour {
   void HandleActionType(DragActionType dragActionType) {
     switch (dragActionType) {
       case DragActionType.INCREASE: {
-        actionTypeImage.sprite = Resources.Load<Sprite>("/Sprites/ActionType/Plus");
+        actionTypeImage.sprite = Resources.Load<Sprite>("Sprites/ActionType/Plus");
         break;
       }
       case DragActionType.DECREASE: {

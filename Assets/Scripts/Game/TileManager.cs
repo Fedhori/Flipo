@@ -114,7 +114,7 @@ public class TileManager : MonoBehaviour {
 
     for (int i = startX; i <= endX; i++) {
       for (int j = startY; j <= endY; j++) {
-        HandleActionType(dragActionArray[actionIndex].dragActionType, i, j);
+        HandleActionType(dragActionArray[actionIndex], i, j);
       }
     }
   }
@@ -225,13 +225,13 @@ public class TileManager : MonoBehaviour {
     GenerateActionContainers();
   }
 
-  void HandleActionType(DragActionType dragActionType, int x, int y) {
-    switch (dragActionType) {
+  void HandleActionType(DragAction dragAction, int x, int y) {
+    switch (dragAction.dragActionType) {
       case DragActionType.DECREASE:
-        tileCounterArray[x, y]--;
+        tileCounterArray[x, y] -= dragAction.dragActionValue;
         break;
       case DragActionType.INCREASE:
-        tileCounterArray[x, y]++;
+        tileCounterArray[x, y] += dragAction.dragActionValue;
         break;
     }
 

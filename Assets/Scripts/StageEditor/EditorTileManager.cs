@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // 에디터의 타일과 관련된 로직들을 수행
 public class EditorTileManager : MonoBehaviour {
@@ -12,7 +14,10 @@ public class EditorTileManager : MonoBehaviour {
 
   [SerializeField] private GameObject tilePrefab;
   [SerializeField] private GameObject actionContainerPrefab;
+  [SerializeField] private GameObject actionTypeContainerPrefab;
+  [SerializeField] private TMP_InputField actionValueInput;
   [SerializeField] private RectTransform actionsContainer;
+  [SerializeField] private RectTransform actionTypesContainer;
   [SerializeField] private Camera mainCamera;
 
   public int[,] tileCounterArray;
@@ -22,6 +27,8 @@ public class EditorTileManager : MonoBehaviour {
   public DragAction[] dragActionArray;
   private GameObject[] dragActionObjectArray;
 
+  private DragActionTypeManager[] actionTypeManagerArray;
+
   private int actionIndex;
   public int xLength = 10;
   public int yLength = 10;
@@ -29,18 +36,20 @@ public class EditorTileManager : MonoBehaviour {
   int tileHeightOffset;
   int originalTileSize = 32;
   int tileSize = 64;
-  
+
   public const int MAXActionLength = 100;
 
   private bool isDragging;
   private Vector2Int startCoordinate;
   private Vector2Int currentCoordinate;
 
-  public DragAction currentDragAction = new (DragActionType.DECREASE, 1);
+  public DragAction currentDragAction;
 
   private void Awake() {
     editorTileManager = this;
     GenerateStage();
+    GenerateActionTypes();
+    SetCurrentDragAction(new DragAction(DragActionType.DECREASE, 1));
   }
 
   // Update is called once per frame
@@ -77,7 +86,7 @@ public class EditorTileManager : MonoBehaviour {
       UpdateTiles();
       AddAction();
       ClearSelectedTiles();
-      
+
       isDragging = false;
     }
   }
@@ -118,6 +127,10 @@ public class EditorTileManager : MonoBehaviour {
         HandleActionType(i, j);
       }
     }
+  }
+
+  public void UpdateCurrentDragActionValue() {
+    currentDragAction = new DragAction(currentDragAction.dragActionType, Int32.Parse(actionValueInput.text));
   }
 
   void DestroyActionContainer() {
@@ -169,7 +182,7 @@ public class EditorTileManager : MonoBehaviour {
     tileCounterArray = new int[yLength, xLength];
     tileCounterMemoryArray = new int[MAXActionLength, yLength, xLength];
     tileObjectArray = new GameObject[yLength, xLength];
-    
+
     dragActionArray = new DragAction[MAXActionLength];
     dragActionObjectArray = new GameObject[MAXActionLength];
   }
@@ -187,7 +200,7 @@ public class EditorTileManager : MonoBehaviour {
       }
     }
   }
-  
+
   void AddAction() {
     GameObject actionContainer = Instantiate(actionContainerPrefab, actionsContainer);
     actionContainer.GetComponent<ActionManager>().SetDragAction(currentDragAction);
@@ -199,18 +212,49 @@ public class EditorTileManager : MonoBehaviour {
     SetStage();
     GenerateTiles();
   }
-  
+
   void HandleActionType(int x, int y) {
     switch (currentDragAction.dragActionType) {
       case DragActionType.DECREASE:
-        tileCounterArray[x, y]++;
+        tileCounterArray[x, y] += currentDragAction.dragActionValue;
         break;
       case DragActionType.INCREASE:
-        tileCounterArray[x, y]--;
+        tileCounterArray[x, y] -= currentDragAction.dragActionValue;
         break;
     }
 
     dragActionArray[actionIndex] = currentDragAction;
     tileObjectArray[x, y].GetComponent<TileInfo>().SetCounter(tileCounterArray[x, y]);
+  }
+
+  void GenerateActionTypes() {
+    Array actionTypeArray = Enum.GetValues(typeof(DragActionType));
+    actionTypeManagerArray = new DragActionTypeManager[actionTypeArray.Length];
+
+    int index = 0;
+    foreach (DragActionType actionType in actionTypeArray) {
+      DragActionTypeManager actionTypeManager = Instantiate(actionTypeContainerPrefab, actionTypesContainer)
+        .GetComponent<DragActionTypeManager>();
+      actionTypeManager.SetDragActionType(actionType);
+      actionTypeManagerArray[index] = actionTypeManager;
+      index++;
+    }
+  }
+
+  public void SetCurrentDragAction(DragAction dragAction) {
+    currentDragAction = dragAction;
+    actionValueInput.text = dragAction.dragActionValue.ToString();
+    UpdateActionTypeContainers();
+
+    void UpdateActionTypeContainers() {
+      foreach (DragActionTypeManager actionTypeManager in actionTypeManagerArray) {
+        if (actionTypeManager.GetDragActionType() == currentDragAction.dragActionType) {
+          actionTypeManager.HighlightContainer();
+        }
+        else {
+          actionTypeManager.UnHighlightContainer();
+        }
+      }
+    }
   }
 }
